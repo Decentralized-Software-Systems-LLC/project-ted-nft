@@ -1,5 +1,5 @@
 # project-ted-nft
-A simple NFT project between a father and daughter
+A simple NFT learning project between a father and daughter
 
 ## Background
 
@@ -28,17 +28,25 @@ Each value indicates which part variation the Ted has, whether _blue_, _green_, 
 
 For example, Ted 11111 is all blue, and Ted 22222 is all green, Ted 11222 is part blue and part green, and so on.
 
-The collection generation is generated with a small `python` script using the Pillow image library. A single loop iterates from Ted 11111 to Ted 55555, skipping any number with a digit greater than 5, combining the respective par images, and outputs the unique Ted into the `img/collection` directory.
+The collection is generated with a small `python` script using the Pillow image library. A single loop iterates from Ted 11111 to Ted 55555, skipping any number with a digit greater than 5, combining the respective par images, and outputs the unique Ted into the `img/collection` directory.
 
 Please see [generate_collection.py](generate_collection.py) for more information on the algorithm.
 
-#### Rareness
+#### Uniqueness
 
-Total NFTs: 3125 (5 parts ^ 5 variants )
+Total NFTs: 3125 (5 parts ^ 5 variants)
 
 | Type | # in collection | Examples | Percentage |
 | --- | --- | --- | --- |
 | Original Variations | 5 | 11111, 22222, 33333 | 0.16% |
 | Single Part Difference | 100 | 11112, 22225, 44144 | 3.2% |
+
+#### Script performance
+
+```
+% time python3 generate_collection.py
+
+python3 generate_collection.py  556.09s user 5.58s system 99% cpu 9:27.34 total
+```
 
 ### Creating the blockchain smart contract
