@@ -15,7 +15,7 @@ max_id = start_id * num_parts
 counter = start_id
 
 # Array of parts
-parts_groups = ["red", "blue", "green", "yellow", "teal"]
+parts_groups = ["blue", "green", "red", "teal", "yellow"]
 
 # Loop
 while counter <= max_id:
