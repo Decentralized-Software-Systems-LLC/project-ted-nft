@@ -6,7 +6,7 @@ async function main() {
 
   await ProjectTed.deployed();
 
-  console.log("Greeter deployed to:", ProjectTed.address);
+  console.log("ProjectTed deployed to:", ProjectTed.address);
 }
 
 main()
