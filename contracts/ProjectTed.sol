@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ProjectTed is ERC721URIStorage, Ownable {
 
+    error InvalidTokenID();
+
     constructor() ERC721("Project Ted", "TED") {}
 
     function validId(uint tokenId) public pure returns (bool) {
@@ -19,18 +21,9 @@ contract ProjectTed is ERC721URIStorage, Ownable {
     function mintNFT(address recipient, string memory tokenURI, uint tokenId)
         public onlyOwner
     {
-        string memory invalidId = "Invalid ID";
-        require(validId(tokenId), invalidId);
+        if (!validId(tokenId))
+            revert InvalidTokenID();
         _safeMint(recipient, tokenId);
         _setTokenURI(tokenId, tokenURI);
-    }
-
-    function mintMultipleNFT(address recipient, string[] memory tokenURIs, uint256[] memory tokenIds)
-        public onlyOwner
-    {
-        require(tokenURIs.length == tokenIds.length, "tokenIds and tokenURIs length mismatch");
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            mintNFT(recipient, tokenURIs[i], tokenIds[i]);
-        }
     }
 }

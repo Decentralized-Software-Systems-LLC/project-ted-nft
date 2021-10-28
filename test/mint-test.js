@@ -88,7 +88,7 @@ describe("ProjectTed", function () {
 
   it("should not mint with a bad ID", async function () {
     let tokenUri = "https://bighappyface.io/a";
-    let msg = "Invalid ID";
+    let msg = "InvalidTokenID";
     let badIds = [
       11110, // Lower bound
       55556, // Upper bound
@@ -119,24 +119,9 @@ describe("ProjectTed", function () {
       ProjectTed.transferFrom(owner.address, secondAddress.address, 11111)
     ).to.be.revertedWith("transfer caller is not owner nor approved");
   });
-
-  it("should mint multiple", async function () {
-    let tokenUris = [];
-    let tokenIds = [];
-    for(let i = 21111; i <= 21115; i++) {
-      tokenIds.push(i);
-      tokenUris.push("https://bighappyface.io/" + i);
-    }
-    await ProjectTed.mintMultipleNFT(owner.address, tokenUris, tokenIds);
-    expect(await ProjectTed.tokenURI(21111)).to.equal(tokenUris[0]);
-    expect(await ProjectTed.tokenURI(21112)).to.equal(tokenUris[1]);
-    expect(await ProjectTed.tokenURI(21113)).to.equal(tokenUris[2]);
-    expect(await ProjectTed.tokenURI(21114)).to.equal(tokenUris[3]);
-    expect(await ProjectTed.tokenURI(21115)).to.equal(tokenUris[4]);
-  });
 });
 
-describe("ProjectTed1155", function () {
+xdescribe("ProjectTed1155", function () {
   // Declare common variables
   let owner, secondAddress, ProjectTedContract, ProjectTed;
 
