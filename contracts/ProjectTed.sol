@@ -50,8 +50,7 @@ contract ProjectTed is ERC721URIStorage, Ownable {
         _safeMint(_msgSender(), tokenId);
         _setTokenURI(tokenId, TOKEN_URI);
     }
-
-    // Withdraws Ether for the owner.    
+   
     function withdraw() public onlyOwner {
         uint balance = address(this).balance;
         payable(msg.sender).transfer(balance);

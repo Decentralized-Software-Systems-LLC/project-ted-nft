@@ -87,6 +87,13 @@ describe("ProjectTed", function () {
     }
   });
 
+  it("should not mint duplicates", async function () {
+    expect(await ProjectTed.tokenURI(11111)).to.equal(tokenUri);
+    await expect(
+      ProjectTed.ownerMint(11111)
+    ).to.be.revertedWith("token already minted");
+  });
+
   it("should transfer", async function () {
     await ProjectTed.transferFrom(owner.address, secondAddress.address, 11111);
     expect(await ProjectTed.ownerOf(11111)).to.equal(secondAddress.address);
