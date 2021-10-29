@@ -25,6 +25,7 @@ describe("Token ID Algorithm", function () {
 describe("ProjectTed", function () {
   // Declare common variables
   let owner, secondAddress, ProjectTedContract, ProjectTed;
+  let tokenUri = "ipfs://QmXmjY1bFMuH5fCGbZ8CHd8fFWzJRZxTKQo7aievy7LUou/{id}.json";
 
   before(async function () {
 
@@ -35,7 +36,6 @@ describe("ProjectTed", function () {
     ProjectTedContract = await ethers.getContractFactory("ProjectTed");
     ProjectTed = await ProjectTedContract.deploy();
     await ProjectTed.deployed();
-
   });
 
   it("should return true for valid IDs", async function () {
@@ -51,6 +51,7 @@ describe("ProjectTed", function () {
 
   it("should return false for invalid IDs", async function () {
     let invalidIds = [
+      10,    // Small
       11110, // Lower bound
       55556, // Upper bound
       11116, // Ones
@@ -62,49 +63,26 @@ describe("ProjectTed", function () {
       16111, // Thousands
       20111, // Thousands
       20000, // Zeros
+      20000000000, // Large
     ]
     for (let i in invalidIds) {
       expect(await ProjectTed.validId(invalidIds[i])).to.be.false;
     }
   });
 
-  it("should mint", async function () {
-    let tokenUri = "https://bighappyface.io/a";
-    await ProjectTed.mintNFT(owner.address, tokenUri, 11111);
+  it("should mint for the owner", async function () {
+    await ProjectTed.ownerMint(11111);
     expect(await ProjectTed.tokenURI(11111)).to.equal(tokenUri);
-
-    await ProjectTed.mintNFT(owner.address, tokenUri, 22222);
-    expect(await ProjectTed.tokenURI(22222)).to.equal(tokenUri);
-
-    await ProjectTed.mintNFT(owner.address, tokenUri, 33333);
-    expect(await ProjectTed.tokenURI(33333)).to.equal(tokenUri);
-
-    await ProjectTed.mintNFT(owner.address, tokenUri, 44444);
-    expect(await ProjectTed.tokenURI(44444)).to.equal(tokenUri);
-
-    await ProjectTed.mintNFT(owner.address, tokenUri, 55555);
-    expect(await ProjectTed.tokenURI(55555)).to.equal(tokenUri);
   });
 
   it("should not mint with a bad ID", async function () {
-    let tokenUri = "https://bighappyface.io/a";
     let msg = "InvalidTokenID";
     let badIds = [
       11110, // Lower bound
-      55556, // Upper bound
-      11116, // Ones
-      11120, // Ones
-      11161, // Tens
-      11201, // Tens
-      11611, // Hundreds
-      12011, // Hundreds
-      16111, // Thousands
-      20111, // Thousands
-      20000, // Zeros
     ]
     for (let i in badIds) {
       await expect(
-        ProjectTed.mintNFT(owner.address, tokenUri, badIds[i])
+        ProjectTed.ownerMint(badIds[i])
       ).to.be.revertedWith(msg);
     }
   });
@@ -118,6 +96,32 @@ describe("ProjectTed", function () {
     await expect(
       ProjectTed.transferFrom(owner.address, secondAddress.address, 11111)
     ).to.be.revertedWith("transfer caller is not owner nor approved");
+  });
+
+  it("should mint for the public", async function () {
+    let payment = ethers.utils.parseEther(".02");
+    let overrides = {
+      value: payment
+    };
+    let oldBalance = await secondAddress.getBalance();
+    await ProjectTed.connect(secondAddress).publicMint(44332, overrides);
+    expect(await ProjectTed.tokenURI(44332)).to.equal(tokenUri);
+    expect(await ProjectTed.ownerOf(44332)).to.equal(secondAddress.address);
+    let newBalance = await secondAddress.getBalance();
+    expect(oldBalance.sub(newBalance).sub(payment) < payment).to.be.true;
+  });
+
+  it("should withdraw to owner", async function () {
+    let oldBalance = await owner.getBalance();
+    await ProjectTed.withdraw();
+    let newBalance = await owner.getBalance();
+    expect(newBalance.sub(oldBalance) > 0).to.be.true;
+  });
+
+  it("should not withdraw if not owner", async function () {
+    await expect(
+      ProjectTed.connect(secondAddress).withdraw()
+    ).to.be.revertedWith("caller is not the owner");
   });
 });
 
